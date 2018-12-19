@@ -35,17 +35,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td> <input type =checkbox> </td>
-                        <td>Jones</td>
-                        <td>Bourne</td>
-                        <td>Stark</td>
-                    </tr>
-                    <tr>
-                        <td>July</td>
-                        <td>Dooley</td>
-                        <td>july@example.com</td>
-                    </tr>
+                    <c:forEach items="${employeesList}" var="employees">
+                        <tr>      
+                            <td> <input type=checkbox> </td>     
+                            <td>${employees.name}</td>
+                            <td>${employees.getFirstname()}</td>
+                            <td>${employees.getTelhome()}</td>
+                            <td>${employees.getTelmob()}</td>
+                            <td>${employees.getTelpro()}</td>
+                            <td>${employees.getAdress()}</td>
+                            <td>${employees.getPostalcode()}</td>
+                            <td>${employees.getCity()}</td>
+                            <td>${employees.getEmail()}</td>
+                        </tr>
+                    </c:forEach>
                 </tbody>
             </table>
         </div>

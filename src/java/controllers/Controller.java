@@ -109,7 +109,7 @@ public class Controller extends HttpServlet {
                                                 Constants.ALL_EMPLOYEES));
                     
                     // Send to the user page to show the users
-                    request.setAttribute("employees", employeesList);
+                    request.setAttribute("employeesList", employeesList);
                     request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
                 }
                 else{
