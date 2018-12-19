@@ -67,7 +67,6 @@ public class Controller extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //processRequest(request, response);
         
         request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
 
@@ -84,7 +83,6 @@ public class Controller extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //processRequest(request, response);
         
         // User input
         String loginEntered = request.getParameter(Constants.LOGIN_FIELD);
@@ -94,7 +92,7 @@ public class Controller extends HttpServlet {
         usersList = db.getUsers(
                         db.getResultSet(
                             db.getStatement(
-                                db.getConnection()), 
+                                db.getConnection()),
                                 Constants.ALL_CREDENTIALS));
         
         //Compare credentials only if the user has entered something
@@ -123,6 +121,8 @@ public class Controller extends HttpServlet {
             request.setAttribute("connection", "Please fill both input.");
             request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
         }
+        
+        
     }
 
     /**
