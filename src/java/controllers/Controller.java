@@ -7,12 +7,16 @@ package controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import jee.model.DataAccess;
 import jee.model.Employees;
 import jee.model.Credentials;
@@ -28,6 +32,7 @@ public class Controller extends HttpServlet {
     DataAccess db;
     ArrayList<Credentials> usersList;
     ArrayList<Employees> employeesList;
+    Employees employee;
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -69,7 +74,6 @@ public class Controller extends HttpServlet {
             throws ServletException, IOException {
         
         request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
-
     }
 
     /**
@@ -84,44 +88,24 @@ public class Controller extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // User input
-        String loginEntered = request.getParameter(Constants.LOGIN_FIELD);
-        String pwdEntered = request.getParameter(Constants.PWD_FIELD);
-                
-        db = new DataAccess();
-        usersList = db.getUsers(
-                        db.getResultSet(
-                            db.getStatement(
-                                db.getConnection()),
-                                Constants.ALL_CREDENTIALS));
-        
-        //Compare credentials only if the user has entered something
-        if (loginEntered != null && pwdEntered != null && !loginEntered.equals("") && !pwdEntered.equals("")) {
-            for (Credentials u : usersList) {
-
-                if ((loginEntered.equals(u.getLogin())) && pwdEntered.equals(u.getPwd())) {
-                    employeesList = db.getEmployees(
-                                        db.getResultSet(
-                                            db.getStatement(
-                                                db.getConnection()), 
-                                                Constants.ALL_EMPLOYEES));
-                    
-                    // Send to the user page to show the users
-                    request.setAttribute("employeesList", employeesList);
-                    request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
-                }
-                else{
-                    // Send back to the login page with the wrong credentials message
-                    request.setAttribute("connection", "Wrong username or password.");
-                    request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
-                }
-            }
-        } else {
-            // Send back to the login page with message
-            request.setAttribute("connection", "Please fill both input.");
-            request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
+        String action = request.getParameter("action");
+        if(action!=null && !action.isEmpty()){
+            String id = request.getParameter("selected");
+            switch (action) {
+                case "Delete":                    
+                    delete(request, response, id);
+                    break;
+                case "Details":
+                    getDetails(request, response, id);
+                    break;
+                case "Add":
+                    break;
+                default:  
+            }           
         }
-        
+        else{
+            login(request, response);
+        }
         
     }
 
@@ -135,4 +119,102 @@ public class Controller extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    /**
+     * The Login function
+     * @param request
+     * @param response 
+     * @throws javax.servlet.ServletException 
+     * @throws java.io.IOException 
+     */
+    protected void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        // User input
+        String loginEntered = request.getParameter(Constants.LOGIN_FIELD);
+        String pwdEntered = request.getParameter(Constants.PWD_FIELD);
+                
+        db = new DataAccess();
+        usersList = db.getUsers(
+                db.getResultSet(
+                        db.getStatement(
+                                db.getConnection()),
+                        Constants.ALL_CREDENTIALS));
+        
+        //Compare credentials only if the user has entered something
+        if (loginEntered != null && pwdEntered != null && !loginEntered.equals("") && !pwdEntered.equals("")) {
+            for (Credentials u : usersList) {
+
+                if ((loginEntered.equals(u.getLogin())) && pwdEntered.equals(u.getPwd())) {
+                    employeesList = db.getEmployees(
+                            db.getResultSet(
+                                    db.getStatement(
+                                            db.getConnection()), 
+                                    Constants.ALL_EMPLOYEES));
+
+                    //Open the session
+                    HttpSession session = request.getSession();
+                    session.setAttribute("employeesListSession", employeesList);
+
+                    // Send to the user page to show the users
+                    request.setAttribute("employeesList", employeesList);
+                    request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
+                }
+                else{
+                    // Send back to the login page with the wrong credentials message
+                    request.setAttribute("connection", "Wrong username or password.");
+                    request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
+                }
+            }
+        } else {
+            // Send back to the login page with the missing input message
+            request.setAttribute("connection", "Please fill both input.");
+            request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
+        }
+        
+        
+    }
+    
+    /**
+     * Delete a user based on his id
+     * @param request
+     * @param response
+     * @param id
+     * @throws ServletException
+     * @throws IOException 
+     */
+    protected void delete(HttpServletRequest request, HttpServletResponse response, String id) throws ServletException, IOException{
+        db = new DataAccess();      
+        db.deleteSet(
+                db.getStatement(
+                        db.getConnection()), 
+                Constants.DELETE_USER + id);
+        
+        employeesList = db.getEmployees(
+                            db.getResultSet(
+                                    db.getStatement(
+                                            db.getConnection()), 
+                                    Constants.ALL_EMPLOYEES));
+        
+        request.setAttribute("employeesList", employeesList);
+        request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
+    }
+    
+    /**
+     * Get details on one user based on his id
+     * @param request
+     * @param response
+     * @param id
+     * @throws ServletException
+     * @throws IOException 
+     */
+    protected void getDetails(HttpServletRequest request, HttpServletResponse response, String id) throws ServletException, IOException{
+        db = new DataAccess();   
+        employee = db.getEmployee(
+                            db.getResultSet(
+                                    db.getStatement(
+                                            db.getConnection()), 
+                                    Constants.GET_USER + id));
+       
+        request.setAttribute("employee", employee);
+        request.getRequestDispatcher(Constants.DETAILS_PAGE).forward(request, response);
+        
+    }
 }

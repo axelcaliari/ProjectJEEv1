@@ -27,6 +27,7 @@ public class DataAccess {
     private Connection dbConn;
     private Statement stmt;
     private ResultSet rs;
+    private int rsInt;
     private String dbUrl;
     private String user;
     private String pwd;
@@ -34,6 +35,10 @@ public class DataAccess {
     //private ArrayList<EmployeesBean> employeesBeanList;
     private ArrayList<Credentials> usersList;
 
+    /**
+     * The connection getter
+     * @return 
+     */
     public Connection getConnection() {
         try {
             Properties prop = new Properties();
@@ -42,9 +47,9 @@ public class DataAccess {
             input = cl.getResourceAsStream(Constants.PATH_PROPERTIES_FILE);
             prop.load(input);
             
-            dbUrl = prop.getProperty(Constants.DB_URL);
-            user = prop.getProperty(Constants.DB_USER);
-            pwd = prop.getProperty(Constants.DB_PWD);
+            dbUrl = "jdbc:derby://localhost:1527/PROJET";
+            user = "adm";
+            pwd = "adm";
 
             dbConn = DriverManager.getConnection(dbUrl, user, pwd);
 
@@ -55,6 +60,11 @@ public class DataAccess {
 
     }
 
+    /**
+     * The Statement getter
+     * @param dbConn
+     * @return 
+     */
     public Statement getStatement(Connection dbConn) {
         try {
             stmt = dbConn.createStatement();
@@ -64,8 +74,14 @@ public class DataAccess {
         return stmt;
     }
 
+    /**
+     * The SELECT set
+     * @param stmt
+     * @param query
+     * @return 
+     */
     public ResultSet getResultSet(Statement stmt, String query) {
-        try {
+        try {          
             rs = stmt.executeQuery(query);
         } catch (SQLException ex) {
              Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);
@@ -73,7 +89,26 @@ public class DataAccess {
         return rs;
     }
     
-    // Gets the credentials from the db
+    /**
+     * The DELETE set
+     * @param stmt
+     * @param query
+     * @return 
+     */
+    public int deleteSet(Statement stmt, String query){
+        try {          
+            rsInt = stmt.executeUpdate(query);
+        } catch (SQLException ex) {
+             Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return rsInt;
+    }
+    
+    /**
+     * Get all the credentials from the db
+     * @param rs
+     * @return ArrayList
+     */
     public ArrayList getUsers(ResultSet rs) {
         usersList = new ArrayList<>();
         try {
@@ -89,7 +124,11 @@ public class DataAccess {
         return usersList;
     }
 
-    // Gets the employees from the db
+    /**
+     * Get all the employees from the db
+     * @param rs
+     * @return ArrayList
+     */
     public ArrayList getEmployees(ResultSet rs) {
         employeesList = new ArrayList<>();
         try {
@@ -111,5 +150,30 @@ public class DataAccess {
              Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);
         }
         return employeesList;
+    }
+    
+    /**
+     * Get one employee based on his id
+     * @param rs
+     * @return Employees
+     */
+    public Employees getEmployee(ResultSet rs){
+        Employees employee = new Employees();
+        try {
+            rs.next();
+            employee.setId(rs.getInt("ID"));
+            employee.setFirstname(rs.getString("FIRSTNAME"));
+            employee.setName(rs.getString("NAME"));
+            employee.setTelhome(rs.getString("TELHOME"));
+            employee.setTelmob(rs.getString("TELMOB"));
+            employee.setTelpro(rs.getString("TELPRO"));
+            employee.setAdress(rs.getString("ADRESS"));
+            employee.setPostalcode(rs.getString("POSTALCODE"));
+            employee.setCity(rs.getString("CITY"));
+            employee.setEmail(rs.getString("EMAIL"));
+        } catch (SQLException ex) {
+             Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return employee;
     }
 }
