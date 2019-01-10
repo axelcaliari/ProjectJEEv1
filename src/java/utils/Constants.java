@@ -29,4 +29,6 @@ public class Constants {
     public static final String ALL_EMPLOYEES = "SELECT * from EMPLOYEES";
     public static final String DELETE_USER = "DELETE from EMPLOYEES WHERE id=";
     public static final String GET_USER = "SELECT * from EMPLOYEES WHERE id=";
+    public static final String ADD_USER = "INSERT INTO EMPLOYEES (NAME,FIRSTNAME,TELHOME,TELMOB,TELPRO,ADRESS,POSTALCODE,CITY,EMAIL) values";
+    public static final String UPDATE_USER = "UPDATE EMPLOYEES SET";
 }

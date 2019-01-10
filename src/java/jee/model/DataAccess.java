@@ -47,9 +47,9 @@ public class DataAccess {
             input = cl.getResourceAsStream(Constants.PATH_PROPERTIES_FILE);
             prop.load(input);
             
-            dbUrl = "jdbc:derby://localhost:1527/PROJET";
-            user = "adm";
-            pwd = "adm";
+            dbUrl = prop.getProperty(Constants.DB_URL);
+            user = prop.getProperty(Constants.DB_USER);
+            pwd = prop.getProperty(Constants.DB_PWD);
 
             dbConn = DriverManager.getConnection(dbUrl, user, pwd);
 
@@ -95,8 +95,8 @@ public class DataAccess {
      * @param query
      * @return 
      */
-    public int deleteSet(Statement stmt, String query){
-        try {          
+    public int executeSet(Statement stmt, String query){
+        try {
             rsInt = stmt.executeUpdate(query);
         } catch (SQLException ex) {
              Logger.getLogger(DataAccess.class.getName()).log(Level.SEVERE, null, ex);

@@ -78,7 +78,6 @@
                 <input type="submit" class='btn btn-primary' name="action" value="Details">
                 <input type="submit" class='btn btn-primary' name="action" value="Add">
             </form>
-
         </div>
     </body>
    
@@ -87,30 +86,4 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     
-    <script>
-        function deleteUser(){   
-            var deleteList = [];
-            $(".selected:checkbox:checked").each(function(){
-                var id = $(this).parent().siblings().find('.name');
-                
-                deleteList.push(name, firstName);
-            });
-            
-            $.ajax({
-                url: "Controller.java", 
-                type: "POST",
-                data: deleteList,
-                success: function(result){
-                    console.log(result);
-                },
-                error: function(data) {
-                    alert(data);
-                } 
-            });
-        }
-        
-        function detailsUser(){
-            console.log("details");
-        }    
-    </script>
 </html>

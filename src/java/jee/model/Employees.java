@@ -24,6 +24,16 @@ public class Employees{
     private String email;
 
     public Employees() {
+        this.id = -1;
+        this.name = "";
+        this.firstname = "";
+        this.telhome = "";
+        this.telmob = "";
+        this.telpro = "";
+        this.adress = "";
+        this.postalcode = "";
+        this.city = "";
+        this.email = "";
     }
 
     public Employees(Integer id) {
