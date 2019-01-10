@@ -75,7 +75,7 @@ public class DataAccess {
     }
 
     /**
-     * The SELECT set
+     * For the SELECT statements
      * @param stmt
      * @param query
      * @return 
@@ -90,7 +90,7 @@ public class DataAccess {
     }
     
     /**
-     * The DELETE set
+     * For the insert/update/delete statements
      * @param stmt
      * @param query
      * @return 

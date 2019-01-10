@@ -16,6 +16,8 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     </head>
     <body class="container">
+        <%@include file="navbar.jsp" %>
+
         <h1>Employees Details Page</h1><hr>
         <% Employees employee = (Employees)request.getAttribute("employee"); %>
         <h3>Details of employee : <%=employee.getFirstname() + " " + employee.getName()%></h3>

@@ -15,13 +15,13 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     </head>
-    <body>
+    <body class="container">
         <%@include file="navbar.jsp" %>
+        <h1 style="color:blue;font-weight:bold;">The club has no member!</h1>
         <div class="container">
-            <h2>List of Employees</h2>
             <form action="Controller" method="POST">
-                <table class="table">
-                    <thead class="thead-dark">
+                <table class="table table-dark">
+                    <thead class="thead">
                         <tr>
                             <th>Sel</th>
                             <th>NAME</th>
@@ -35,29 +35,7 @@
                             <th>EMAIL</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <% 
-                            ArrayList employees = (ArrayList)request.getAttribute("employeesList");
-                            for(int i = 0; i < employees.size(); i++) {
-                                Employees employee = (Employees)employees.get(i);
-                        %>
-                            <tr>     
-                                <td><input type='radio' value='<%=employee.getId()%>' class='selected' name='selected' checked="checked"></td>
-                                <td><%=employee.getName()%></td>
-                                <td><%=employee.getFirstname()%></td>
-                                <td><%=employee.getTelhome()%></td>
-                                <td><%=employee.getTelmob()%></td>
-                                <td><%=employee.getTelpro()%></td>
-                                <td><%=employee.getAdress()%></td>
-                                <td><%=employee.getPostalcode()%></td>
-                                <td><%=employee.getCity()%></td>
-                                <td><%=employee.getEmail()%></td>
-                            </tr>
-                        <% } %>                 
-                    </tbody>
-                </table>        
-                <input type="submit" class='btn btn-primary' name="action" value="Delete">
-                <input type="submit" class='btn btn-primary' name="action" value="Details">
+                </table>
                 <input type="submit" class='btn btn-primary' name="action" value="Add">
             </form>
         </div>

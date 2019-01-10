@@ -73,6 +73,12 @@ public class Controller extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        HttpSession session = request.getSession();
+        
+        if (request.getParameter("logout") != null) {  
+            session.invalidate();
+        }
+        
         request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
     }
 
@@ -159,19 +165,12 @@ public class Controller extends HttpServlet {
             for (Credentials u : usersList) {
 
                 if ((loginEntered.equals(u.getLogin())) && pwdEntered.equals(u.getPwd())) {
-                    employeesList = db.getEmployees(
-                            db.getResultSet(
-                                    db.getStatement(
-                                            db.getConnection()), 
-                                    Constants.ALL_EMPLOYEES));
-
                     //Get the current session
                     HttpSession session = request.getSession();
-                    session.setAttribute("employeesListSession", employeesList);
+                    session.setAttribute("login", loginEntered);
+                    //session.setAttribute("password", pwdEntered);
 
-                    // Send to the user page to show the users
-                    request.setAttribute("employeesList", employeesList);
-                    request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
+                    backToMainPage(request, response);
                 }
                 else{
                     // Send back to the login page with the wrong credentials message
@@ -243,10 +242,18 @@ public class Controller extends HttpServlet {
                                     db.getStatement(
                                             db.getConnection()), 
                                     Constants.ALL_EMPLOYEES));
+
+        if(employeesList.isEmpty()){
+            // Send to the user page to show the users
+            request.setAttribute("employeesList", "empty");
+            request.getRequestDispatcher(Constants.USERS_EMPTY_PAGE).forward(request, response);
+        }
+        else{
+            // Send to the user page to show the users
+            request.setAttribute("employeesList", employeesList);
+            request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
+        }
         
-        // Send to the user page to show the users
-        request.setAttribute("employeesList", employeesList);
-        request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
     }
     
     
@@ -297,7 +304,7 @@ public class Controller extends HttpServlet {
                         db.getConnection()), 
                 Constants.ADD_USER + queryWhere);
         
-        backToMainPage(request, response);
+        backToMainPage(request, response);       
     }
     
     

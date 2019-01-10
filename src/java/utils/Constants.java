@@ -20,6 +20,7 @@ public class Constants {
     public static final String PWD_FIELD = "pwdField";
 
     public static final String USERS_PAGE = "WEB-INF/users.jsp";
+    public static final String USERS_EMPTY_PAGE = "WEB-INF/usersEmpty.jsp";
     public static final String LOGIN_PAGE = "WEB-INF/login.jsp";
     public static final String DETAILS_PAGE = "WEB-INF/details.jsp";
 
