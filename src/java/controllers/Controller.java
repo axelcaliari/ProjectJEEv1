@@ -76,6 +76,7 @@ public class Controller extends HttpServlet {
         request.getRequestDispatcher(Constants.LOGIN_PAGE).forward(request, response);
     }
 
+    
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -99,8 +100,21 @@ public class Controller extends HttpServlet {
                     getDetails(request, response, id);
                     break;
                 case "Add":
+                    displayDetailsEmpty(request, response);
                     break;
-                default:  
+                case "Update":                  
+                    String idEmployee = request.getParameter("idEmployee");
+                    
+                    if(Integer.parseInt(idEmployee) == -1)
+                        addUser(request, response);
+                    else
+                        updateUser(request, response, Integer.parseInt(idEmployee));
+                    break;
+                case "Cancel":
+                    backToMainPage(request, response);
+                    break;
+                default: 
+                    break;
             }           
         }
         else{
@@ -108,6 +122,7 @@ public class Controller extends HttpServlet {
         }
         
     }
+    
 
     /**
      * Returns a short description of the servlet.
@@ -119,8 +134,9 @@ public class Controller extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    
     /**
-     * The Login function
+     * The login function
      * @param request
      * @param response 
      * @throws javax.servlet.ServletException 
@@ -149,7 +165,7 @@ public class Controller extends HttpServlet {
                                             db.getConnection()), 
                                     Constants.ALL_EMPLOYEES));
 
-                    //Open the session
+                    //Get the current session
                     HttpSession session = request.getSession();
                     session.setAttribute("employeesListSession", employeesList);
 
@@ -172,8 +188,9 @@ public class Controller extends HttpServlet {
         
     }
     
+    
     /**
-     * Delete a user based on his id
+     * Delete an employee based on his id
      * @param request
      * @param response
      * @param id
@@ -182,23 +199,17 @@ public class Controller extends HttpServlet {
      */
     protected void delete(HttpServletRequest request, HttpServletResponse response, String id) throws ServletException, IOException{
         db = new DataAccess();      
-        db.deleteSet(
+        db.executeSet(
                 db.getStatement(
                         db.getConnection()), 
                 Constants.DELETE_USER + id);
         
-        employeesList = db.getEmployees(
-                            db.getResultSet(
-                                    db.getStatement(
-                                            db.getConnection()), 
-                                    Constants.ALL_EMPLOYEES));
-        
-        request.setAttribute("employeesList", employeesList);
-        request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
+        backToMainPage(request, response);
     }
     
+    
     /**
-     * Get details on one user based on his id
+     * Get details on one employee based on his id
      * @param request
      * @param response
      * @param id
@@ -216,5 +227,115 @@ public class Controller extends HttpServlet {
         request.setAttribute("employee", employee);
         request.getRequestDispatcher(Constants.DETAILS_PAGE).forward(request, response);
         
+    }
+    
+    
+    /**
+     * When the user clicks on Cancel he is redirected to the list of employees (main page), or when an operation is done
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
+    protected void backToMainPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        employeesList = db.getEmployees(
+                            db.getResultSet(
+                                    db.getStatement(
+                                            db.getConnection()), 
+                                    Constants.ALL_EMPLOYEES));
+        
+        // Send to the user page to show the users
+        request.setAttribute("employeesList", employeesList);
+        request.getRequestDispatcher(Constants.USERS_PAGE).forward(request, response);
+    }
+    
+    
+    /**
+     * Display the details page with empty inputs
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
+    protected void displayDetailsEmpty(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        employee = new Employees();
+        
+        request.setAttribute("employee", employee);
+        request.getRequestDispatcher(Constants.DETAILS_PAGE).forward(request, response);
+    }
+    
+    
+    /**
+     * Create a new employee
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
+    protected void addUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        // faire des tests pour valider les données (ex: tel seulement 10 chiffres
+        ArrayList dataEmployee = new ArrayList();
+        dataEmployee.add(request.getParameter("name"));
+        dataEmployee.add(request.getParameter("firstname"));
+        dataEmployee.add(request.getParameter("telhome"));
+        dataEmployee.add(request.getParameter("telmob"));
+        dataEmployee.add(request.getParameter("telpro"));
+        dataEmployee.add(request.getParameter("address"));
+        dataEmployee.add(request.getParameter("postalcode"));
+        dataEmployee.add(request.getParameter("city"));
+        dataEmployee.add(request.getParameter("email"));
+
+        String queryWhere = "('" + dataEmployee.get(0) + "'";
+        for(int i=1; i<dataEmployee.size(); i++){
+            queryWhere += ",'" + dataEmployee.get(i) + "'";
+        }
+        queryWhere += ")";
+        
+        db = new DataAccess();      
+        db.executeSet(
+                db.getStatement(
+                        db.getConnection()), 
+                Constants.ADD_USER + queryWhere);
+        
+        backToMainPage(request, response);
+    }
+    
+    
+    /**
+     * Update an already existing employee
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException 
+     */
+    protected void updateUser(HttpServletRequest request, HttpServletResponse response, int id) throws ServletException, IOException{
+        // faire des tests pour valider les données (ex: tel seulement 10 chiffres
+        ArrayList dataEmployee = new ArrayList();
+        dataEmployee.add(request.getParameter("name"));
+        dataEmployee.add(request.getParameter("firstname"));
+        dataEmployee.add(request.getParameter("telhome"));
+        dataEmployee.add(request.getParameter("telmob"));
+        dataEmployee.add(request.getParameter("telpro"));
+        dataEmployee.add(request.getParameter("address"));
+        dataEmployee.add(request.getParameter("postalcode"));
+        dataEmployee.add(request.getParameter("city"));
+        dataEmployee.add(request.getParameter("email"));
+
+        String[] nameCol = new String[]{"firstname","telhome","telmob","telpro","adress","postalcode","city","email"};   
+        
+        String querySet = " name='" + dataEmployee.get(0) + "'";
+        for(int i=1; i<dataEmployee.size(); i++){
+            querySet += "," + nameCol[i-1] + "='" + dataEmployee.get(i) + "'";
+        }
+        
+        String queryWhere = "WHERE id=" + id;
+
+        db = new DataAccess();      
+        int result = db.executeSet(
+                db.getStatement(
+                        db.getConnection()),
+                Constants.UPDATE_USER + querySet + " " + queryWhere);
+        
+        backToMainPage(request, response);
     }
 }
